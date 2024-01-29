@@ -1,8 +1,9 @@
 {
-  "token": "TOKEN",
-  "host": "IP",
-  "port": "PORT",
+  "token": "BOT_TOKEN",
+  "host": "SERVER_IP",
+  "port": "SERVER_PORT",
   "rcon_port": "RCON_PORT",
-  "rcon_password": "ADMINPASSWORD",
-  "rcon_role": "RCON_ROLE"
+  "rcon_password": "ADMIN_PASSWORD",
+  "rcon_role": "RCON_ROLE",
+  "whitelist_enabled": false
 }
