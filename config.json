@@ -1,9 +1,9 @@
 {
-  "token": "BOT_TOKEN",
-  "host": "SERVER_IP",
+  "token": "MTIwMDQxNjU0NjE0NTcxMDA4MA.G5v6su.NhdF_P2XwFvWN-erdcuLqOBwJJ_M7yQubvxIXk",
+  "host": "careless.network",
   "port": 8211,
   "rcon_port": 25575,
-  "rcon_password": "ADMIN_PASSWORD",
-  "rcon_role": "RCON_ROLE",
-  "whitelist_enabled": false
+  "rcon_password": "Autohaus1337!",
+  "rcon_role": "yeet",
+  "whitelist_enabled": true
 }
