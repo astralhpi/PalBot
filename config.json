@@ -1,8 +1,8 @@
 {
   "token": "BOT_TOKEN",
   "host": "SERVER_IP",
-  "port": "SERVER_PORT",
-  "rcon_port": "RCON_PORT",
+  "port": 8211,
+  "rcon_port": 25575,
   "rcon_password": "ADMIN_PASSWORD",
   "rcon_role": "RCON_ROLE",
   "whitelist_enabled": false
