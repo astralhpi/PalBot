@@ -112,7 +112,7 @@ const showPlayers = async () => {
           console.log(`No players for 20 minutes, shutting down server. noPlayerFrom: ${noPlayerFrom}, now: ${Date.now()}`)
           const channelId = client.channels.cache.get(config.notice_channel);
           const channel = client.channels.cache.get(channelId);
-          channel.send("플레이어가 20분 동안 없어서 서버를 종료합니다.");
+          channel.send("플레이어가 20분 동안 없어서 서버를 종료합니다. 플레이 하시려면 /start 명령어로 서버를 다시 시작해주세요.");
           const stdout = execSync(config.server_shutdown_command);
           console.log(stdout.toString());
         }
