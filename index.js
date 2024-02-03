@@ -15,6 +15,7 @@ const {
 const { User, Message, GuildMember, ThreadMember } = Partials;
 const rconHandler = require("./Functions/rconHandler");
 const fs = require('fs').promises;
+const { execSync } = require('child_process');
 
 const client = new Client({
   intents: [Guilds, GuildMembers, GuildMessages, GuildVoiceStates, MessageContent],
@@ -83,6 +84,8 @@ const whitelistCheck = async () => {
   }
 };
 
+let noPlayerFrom = null;
+
 const showPlayers = async () => {
   try {
     const { GameDig } = await import('gamedig');
@@ -95,11 +98,31 @@ const showPlayers = async () => {
       givenPortOnly: true
     })
       .then((state) => {
-        const statusText = `${state.raw.attributes.PLAYERS_l}/${state.raw.settings.maxPublicPlayers}`;
+        const players = Number(state.raw.attributes.PLAYERS_l);
+        if (players > 0) {
+          noPlayerFrom = null;
+          console.log(`Server is online, ${players} players are online`);
+        }
+        else if (noPlayerFrom === null) {
+          noPlayerFrom = new Date();
+          console.log("No players, setting noPlayerFrom", noPlayerFrom);
+        }
+
+        if (noPlayerFrom !== null && noPlayerFrom.getTime() < Date.now() - 20 * 60 * 1000) {
+          console.log(`No players for 20 minutes, shutting down server. noPlayerFrom: ${noPlayerFrom}, now: ${Date.now()}`)
+          const channelId = client.channels.cache.get(config.notice_channel);
+          const channel = client.channels.cache.get(channelId);
+          channel.send("플레이어가 20분 동안 없어서 서버를 종료합니다.");
+          const stdout = execSync(config.server_shutdown_command);
+          console.log(stdout.toString());
+        }
+        const statusText = `${players}/${state.raw.settings.maxPublicPlayers}`;
         client.user.setActivity(`Players: ${statusText}`, { type: ActivityType.Watching });
       })
       .catch((error) => {
+        client.user.setActivity('Server: Offline', { type: ActivityType.Watching });
         console.log(`Server is offline, error: ${error}`);
+        noPlayerFrom = null;
       });
   } catch (err) {
     console.log(`Error: ${err}`);
@@ -110,7 +133,7 @@ const showPlayers = async () => {
 showPlayers();
 
 // Player count check, every 2 minutes
-intervalId = setInterval(showPlayers, 2 * 60 * 1000);
+intervalId = setInterval(showPlayers, 30 * 1000);
 
 const cleanId = str => str.replace(/\D/g, '').trim(); // Trim whitespaces
 

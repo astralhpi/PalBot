@@ -5,5 +5,8 @@
   "rcon_port": 25575,
   "rcon_password": "RCON_PASSWORD",
   "rcon_role": "RCON_ROLE",
-  "whitelist_enabled": false
+  "whitelist_enabled": false,
+  "notice_channel": "NOTICE_CHANNEL_ID",
+  "server_start_command": "# command to start server",
+  "server_stop_command": "# command to stop server"
 }
