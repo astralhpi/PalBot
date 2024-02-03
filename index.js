@@ -85,6 +85,7 @@ const whitelistCheck = async () => {
 };
 
 let noPlayerFrom = null;
+let isOffline = false;
 
 const showPlayers = async () => {
   try {
@@ -115,6 +116,13 @@ const showPlayers = async () => {
           const stdout = execSync(config.server_shutdown_command);
           console.log(stdout.toString());
         }
+
+        if (isOffline) {
+          const channel = client.channels.cache.get(config.notice_channel);
+          channel.send("서버가 온라인 상태로 변경되었습니다.");
+          isOffline = false;
+        }
+
         const statusText = `${players}/${state.raw.settings.maxPublicPlayers}`;
         client.user.setActivity(`Players: ${statusText}`, { type: ActivityType.Watching });
       })
@@ -122,6 +130,7 @@ const showPlayers = async () => {
         client.user.setActivity('Server: Offline', { type: ActivityType.Watching });
         console.log(`Server is offline, error: ${error}`);
         noPlayerFrom = null;
+        isOffline = true;
       });
   } catch (err) {
     console.log(`Error: ${err}`);
