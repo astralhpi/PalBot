@@ -32,7 +32,10 @@ module.exports = client;
 
 loadEvents(client);
 
-client.login(client.config.token);
+let logined = false;
+client.login(client.config.token).then(() => {
+  logined = true;
+})
 
 let intervalId;
 
@@ -88,6 +91,10 @@ let noPlayerFrom = null;
 let isOffline = false;
 
 const showPlayers = async () => {
+  if (!logined) {
+    return;
+  }
+
   try {
     const { GameDig } = await import('gamedig');
     const config = JSON.parse(await fs.readFile('./config.json', 'utf-8'));
@@ -118,8 +125,6 @@ const showPlayers = async () => {
         }
 
         if (isOffline) {
-          const channel = client.channels.cache.get(config.notice_channel);
-          channel.send("서버가 온라인 상태로 변경되었습니다.");
           isOffline = false;
         }
 
