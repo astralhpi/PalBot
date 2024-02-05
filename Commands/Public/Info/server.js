@@ -27,23 +27,32 @@ module.exports = {
         .setColor(0xfff200)
         .setTitle(`서버 정보`)
         .addFields(
-          { name: '**Server Name**', value: `${state.name}`, inline: true },
-          { name: '**Server IP**', value: `${config.host}`, inline: true },
-          { name: '**Server Port**', value: `${config.port}`, inline: true },
-          { name: '**Players**', value: `${state.raw.attributes.PLAYERS_l}/${state.raw.settings.maxPublicPlayers}`, inline: true },
-          { name: '**Days**', value: `${state.raw.attributes.DAYS_l}`, inline: true },
-          { name: '**Last Restart**', value: `<t:${state.raw.attributes.CREATE_TIME_l}:T>`, inline: true },
-          { name: '**Password**', value: `${state.raw.attributes.ISPASSWORD_b}`, inline: true },
-          { name: '**Version**', value: `${state.raw.attributes.VERSION_s}`, inline: true },
+          { name: '**서버 상태**', value: `Online`, inline: true },
+          { name: '**서버 주소**', value: `${config.host}:${config.port}`, inline: true },
+          { name: '**플레이어**', value: `${state.raw.attributes.PLAYERS_l}/${state.raw.settings.maxPublicPlayers}`, inline: true },
+          { name: '**경과한 일 수**', value: `${state.raw.attributes.DAYS_l}`, inline: true },
+          { name: '**버전**', value: `${state.raw.attributes.VERSION_s}`, inline: true },
         )
-        //.setDescription(`www`)
         .setTimestamp()
-        .setFooter({ text: 'Made by Lysec' })
+        .setFooter({ text: 'Based on PalBot Made by Lysec' })
         .setURL('https://github.com/Ly-sec/PalBot');
 
       interaction.reply({ embeds: [exampleEmbed] });
     }).catch((error) => {
       console.log(`Server is offline, error: ${error}`)
+      const exampleEmbed = new EmbedBuilder()
+        .setColor(0xfff200)
+        .setTitle(`서버 정보`)
+        .addFields(
+          { name: '**서버 상태**', value: `Offline`, inline: true },
+          { name: '**서버 주소**', value: `${config.host}:${config.port}`, inline: true },
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Based on PalBot Made by Lysec' })
+        .setURL('https://github.com/Ly-sec/PalBot');
+
+      interaction.reply({ embeds: [exampleEmbed] });
+
     })
 
   },
