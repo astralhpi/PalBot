@@ -101,7 +101,7 @@ const showPlayers = async () => {
     await rconHandler.connect();
     console.log("Connected to RCON");
     const response = await rconHandler.sendCommand("ShowPlayers");
-    const players = parseInt(Math.max(response.split("\n").length - 2, 0));
+    const players = Math.max(parseInt(response.split("\n").length - 2), 0);
     if (players > 0) {
       noPlayerFrom = null;
       console.log(`Server is online, ${players} players are online`);
