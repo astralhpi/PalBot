@@ -91,54 +91,51 @@ let noPlayerFrom = null;
 let isOffline = false;
 
 const showPlayers = async () => {
+  console.log("showPlayers");
   if (!logined) {
     return;
   }
 
   try {
-    const { GameDig } = await import('gamedig');
-    const config = JSON.parse(await fs.readFile('./config.json', 'utf-8'));
+    console.log("Checking server status");
+    await rconHandler.connect();
+    console.log("Connected to RCON");
+    const response = await rconHandler.sendCommand("ShowPlayers");
+    const players = Math.max(response.split("\n").length - 2, 0)
+    if (players > 0) {
+      noPlayerFrom = null;
+      console.log(`Server is online, ${players} players are online`);
+    }
+    else if (noPlayerFrom === null) {
+      noPlayerFrom = new Date();
+      console.log("No players, setting noPlayerFrom", noPlayerFrom);
+    }
 
-    GameDig.query({
-      type: 'palworld',
-      host: config.host,
-      port: config.port,
-      givenPortOnly: true
-    })
-      .then((state) => {
-        const players = Number(state.raw.attributes.PLAYERS_l);
-        if (players > 0) {
-          noPlayerFrom = null;
-          console.log(`Server is online, ${players} players are online`);
-        }
-        else if (noPlayerFrom === null) {
-          noPlayerFrom = new Date();
-          console.log("No players, setting noPlayerFrom", noPlayerFrom);
-        }
+    if (noPlayerFrom !== null && noPlayerFrom.getTime() < Date.now() - 20 * 60 * 1000) {
+      console.log(`No players for 20 minutes, shutting down server. noPlayerFrom: ${noPlayerFrom}, now: ${Date.now()}`)
+      const channel = client.channels.cache.get(config.notice_channel);
+      channel.send("플레이어가 20분 동안 없어서 서버를 종료합니다. 플레이 하시려면 /start 명령어로 서버를 다시 시작해주세요.");
+      const stdout = execSync(config.server_stop_command);
+      console.log(stdout.toString());
+    }
 
-        if (noPlayerFrom !== null && noPlayerFrom.getTime() < Date.now() - 20 * 60 * 1000) {
-          console.log(`No players for 20 minutes, shutting down server. noPlayerFrom: ${noPlayerFrom}, now: ${Date.now()}`)
-          const channel = client.channels.cache.get(config.notice_channel);
-          channel.send("플레이어가 20분 동안 없어서 서버를 종료합니다. 플레이 하시려면 /start 명령어로 서버를 다시 시작해주세요.");
-          const stdout = execSync(config.server_stop_command);
-          console.log(stdout.toString());
-        }
+    if (isOffline) {
+      isOffline = false;
+    }
 
-        if (isOffline) {
-          isOffline = false;
-        }
-
-        const statusText = `${players}/${state.raw.settings.maxPublicPlayers}`;
-        client.user.setActivity(`Players: ${statusText}`, { type: ActivityType.Watching });
-      })
-      .catch((error) => {
-        client.user.setActivity('Server: Offline', { type: ActivityType.Watching });
-        console.log(`Server is offline, error: ${error}`);
-        noPlayerFrom = null;
-        isOffline = true;
-      });
-  } catch (err) {
-    console.log(`Error: ${err}`);
+    const statusText = `${players}/32`;
+    console.log(`Server is online, ${players} players are online`);
+    client.user.setActivity(`Players: ${statusText}`, { type: ActivityType.Watching });
+  }
+  catch (err) {
+    console.error(err);
+    client.user.setActivity('Server: Offline', { type: ActivityType.Watching });
+    console.log(`Server is offline, error: ${err}`);
+    noPlayerFrom = null;
+    isOffline = true;
+  }
+  finally {
+    rconHandler.disconnect();
   }
 };
 
