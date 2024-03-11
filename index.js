@@ -102,15 +102,17 @@ const showPlayers = async () => {
     console.log("Connected to RCON");
     const response = await rconHandler.sendCommand("ShowPlayers");
     const players = Math.max(parseInt(response.split("\n").length - 2), 0);
+    console.log(typeof players, players)
     if (players > 0) {
       noPlayerFrom = null;
-      console.log(`Server is online, ${players} players are online`);
+      console.log(`noPlayerFrom = null`);
     }
     else if (noPlayerFrom === null) {
       noPlayerFrom = new Date();
       console.log("No players, setting noPlayerFrom", noPlayerFrom);
     }
 
+    console.log(noPlayerFrom, 20 * 60 * 1000 + noPlayerFrom.getTime() - Date.now())
     if (noPlayerFrom !== null && noPlayerFrom.getTime() < Date.now() - 20 * 60 * 1000) {
       console.log(`No players for 20 minutes, shutting down server. noPlayerFrom: ${noPlayerFrom}, now: ${Date.now()}`)
       const channel = client.channels.cache.get(config.notice_channel);
