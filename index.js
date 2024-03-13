@@ -90,6 +90,26 @@ const whitelistCheck = async () => {
 let noPlayerFrom = null;
 let isOffline = false;
 
+async function getPlayers(retry = 2) {
+  try {
+    await rconHandler.connect();
+    const response = await rconHandler.sendCommand("ShowPlayers");
+    const players = Math.max(parseInt(response.split("\n").length - 2), 0);
+    return players;
+  }
+  catch (err) {
+    console.error(err);
+    if (retry > 0) {
+      return getPlayers(retry - 1);
+    }
+    return 0;
+  }
+  finally {
+    rconHandler.disconnect();
+  }
+
+}
+
 const showPlayers = async () => {
   console.log("showPlayers");
   if (!logined) {
@@ -98,11 +118,7 @@ const showPlayers = async () => {
 
   try {
     console.log("Checking server status");
-    await rconHandler.connect();
-    console.log("Connected to RCON");
-    const response = await rconHandler.sendCommand("ShowPlayers");
-    const players = Math.max(parseInt(response.split("\n").length - 2), 0);
-    console.log(typeof players, players)
+    const players = await getPlayers();
     if (players > 0) {
       noPlayerFrom = null;
       console.log(`noPlayerFrom = null`);
@@ -112,7 +128,7 @@ const showPlayers = async () => {
       console.log("No players, setting noPlayerFrom", noPlayerFrom);
     }
 
-    console.log(noPlayerFrom, 20 * 60 * 1000 + noPlayerFrom.getTime() - Date.now())
+    console.log(noPlayerFrom, noPlayerFrom && (20 * 60 * 1000 + noPlayerFrom.getTime() - Date.now()))
     if (noPlayerFrom !== null && noPlayerFrom.getTime() < Date.now() - 20 * 60 * 1000) {
       console.log(`No players for 20 minutes, shutting down server. noPlayerFrom: ${noPlayerFrom}, now: ${Date.now()}`)
       const channel = client.channels.cache.get(config.notice_channel);
